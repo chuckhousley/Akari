@@ -40,12 +40,12 @@ class Input:
                 try:
                     self.x = int(line[7:])
                 except ValueError:
-                    self.x = 0
+                    self.x = 1
             elif line[0:6] == 'size_y':
                 try:
                     self.y = int(line[7:])
                 except ValueError:
-                    self.y = 0
+                    self.y = 1
             elif line[0:4] == 'seed':
                 try:
                     self.seed = int(line[5:])
