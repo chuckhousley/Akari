@@ -9,6 +9,22 @@ def get_all_unlit(board):
     return unlit
 
 
+def get_all_lit(board):
+    lit = []
+    for tile in board.keys():
+        if board[tile] in [7, 8]:
+            lit.append(tile)
+    return lit
+
+
+def get_all_mutually_lit(board):
+    mutlit = []
+    for tile in board.keys():
+        if board[tile] == 9:
+            mutlit.append(tile)
+    return mutlit
+
+
 def update_tile(board, x, y, n):
     board[(x, y)] = n
 
@@ -26,36 +42,36 @@ def get_neighbors(board, x, y):
     return neighbors
 
 
-def rec_light(board, x, y):
-    if x < 1 or y < 1 or x > board.max_x or y > board.max_y:
+def rec_lightable_tile_finder(game, x, y):
+    if x < 1 or y < 1 or x > game.max_x or y > game.max_y:
         return False
-    if board[(x, y)] in [0, 1, 2, 3, 4, 5, 9]:
+    if game.board[(x, y)] in [0, 1, 2, 3, 4, 5, 9]:
         return False
-    if board[(x, y)] in [6, 7, 8]:
+    if game.board[(x, y)] in [6, 7, 8]:
         return True
 
 
-def get_reachable(board, x, y):
+def get_reachable(game, x, y):
     reachable = []
-    for i in range(1, board.max_x):
-        if not rec_light(board, x+i, y):
+    for i in range(1, game.max_x):
+        if not rec_lightable_tile_finder(game, x+i, y):
             break
         else:
             reachable.append((x+i, y))
 
-    for i in range(1, board.max_x):
-        if not rec_light(board, x-i, y):
+    for i in range(1, game.max_x):
+        if not rec_lightable_tile_finder(game, x-i, y):
             break
         else:
             reachable.append((x-i, y))
 
-    for i in range(1, board.max_y):
-        if not rec_light(board, x, y+i):
+    for i in range(1, game.max_y):
+        if not rec_lightable_tile_finder(game, x, y+i):
             break
         else:
             reachable.append((x, y+i))
-    for i in range(1, board.max_y):
-        if not rec_light(board, x, y-i):
+    for i in range(1, game.max_y):
+        if not rec_lightable_tile_finder(game, x, y-i):
             break
         else:
             reachable.append((x, y-i))
@@ -70,17 +86,17 @@ def get_lights(board):
     return lights
 
 
-def place_light(board, x, y):
+def place_light(game, x, y):
+    board = game.board
     n = board[(x, y)]
     if n in [0, 1, 2, 3, 4, 5, 8, 9]:
         return
     else:
         update_tile(board, x, y, n+2)
-    tiles = get_reachable(board, x, y)
+    tiles = get_reachable(game, x, y)
     for t in tiles:
         if board[t] == 6:
             board[t] = 7
-        elif board[t] == 8:
-            board[t] = 9
-        else:
             continue
+        elif board[t] == 7:
+            board[t] = 9

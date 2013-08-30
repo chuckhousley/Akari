@@ -2,12 +2,13 @@ __author__ = 'Chuck'
 from functions import *
 
 
-def random_search(b):
-    tiles = get_all_unlit(b.board)
+def random_search(game):
+    chance = .99#game.rand.random()
+    tiles = get_all_unlit(game.board)
     for t in tiles:
-        if b.rand.random() > 0.5:
-            update_tile(b.board, t[0], t[1], 8)
-    tiles2 = get_all_unlit(b.board)
-
-    print len(tiles)
-    print len(tiles2)
+        if game.rand.random() > chance:
+            place_light(game, t[0], t[1])
+    if len(get_all_mutually_lit(game.board)) > 0:
+        return 0
+    else:
+        return len(get_all_lit(game.board))
