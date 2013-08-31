@@ -16,7 +16,7 @@ class Input:
     block_list = []
 
     def you_messed_up(self):
-        print "Invalid input. Please check .cfg and .lup files for errors"
+        print "Invalid input. Please check command line arguments, .cfg,  and .lup files for errors"
         exit()
 
     def __init__(self, filename):

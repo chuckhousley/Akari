@@ -25,7 +25,7 @@ def get_all_mutually_lit(board):
     return get_all(board, [9])
 
 
-def get_lights(board):
+def get_all_lights(board):
     return get_all(board, [7])
 
 def update_tile(board, x, y, n):
@@ -107,14 +107,49 @@ def black_box_check(game):
 
 def random_board_create(game, file_input):
     first = game.rand.choice(get_all_unlit(game.board))
-    print first
-    exit()
+    place_light(game, first[0], first[1])
 
+    while True:
+        block_tile = game.rand.choice(get_all(game.board, [6, 7]))
+        if game.rand.random() > 0.7:
+            update_tile(game.board, block_tile[0], block_tile[1], 5)
+        if game.rand.random > 0.8:
+            break
 
+    for m in get_all(game.board, [7, 8]):
+        update_tile(game.board, m[0], m[1], 6)
+    place_light(game, first[0], first[1])
 
-    lup = 'puzzle-' + str(file_input.seed) +'.lup'
+    while True:
+        tile = game.rand.choice(get_all_unlit(game.board))
+        choice = game.rand.random()
+        if choice < 0.01:
+            place_light(game, tile[0], tile[1])
+        elif choice > 0.95:
+            update_tile(game.board, tile[0], tile[1], 5)
+        if not len(get_all_unlit(game.board)):
+            break
+
+    for box in get_all(game.board, [5]):
+        count = 0
+        neighbors = get_neighbors(game, box[0], box[1])
+        for n in neighbors:
+            if game.board[n] == 8:
+                count += 1
+        if game.rand.random() > 0.5:
+            game.board[box] = count
+
+    for tile in game.board.keys():
+        if game.board[tile] in [7, 8]:
+            game.board[tile] = 6
+        game.original_state[tile] = game.board[tile]
+
+    lup = 'puzzle-' + str(file_input.seed) + '.lup'
     f = open(lup, 'w')
-    f.write(str(file_input.size_x) + '\n')
-    f.write(str(file_input.size_y) + '\n')
+    f.write(str(file_input.x) + '\n')
+    f.write(str(file_input.y) + '\n')
+    for box in get_all(game.board, range(6)):
+        f.write(str(box[0]) + ' ' + str(box[1]) + ' ' + str(game.board[box]) + '\n')
     f.close()
+    file_input.filename = lup
 

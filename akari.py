@@ -2,13 +2,18 @@ __author__ = 'Chuck'
 
 from Game import *
 from Input import *
-from functions import get_lights, random_board_create
+from functions import get_all_lights, random_board_create
 from search import random_search
 import sys
 
 
 def main():
-    filename = 'random.cfg'#'default.cfg'
+    #theres a better way to do this, but this is faster
+    if len(sys.argv) == 3 and sys.argv[1] == '-c':
+        filename = sys.argv[2]
+    else:
+        filename = 'default.cfg'
+
     file_input = Input(filename)
     game = Game(file_input)
 
@@ -30,7 +35,7 @@ def main():
             log.write(str(n+1) + '\t' + str(result) + '\n')
             if result > best_result:
                 best_result = result
-                best_soln = get_lights(game.board)
+                best_soln = get_all_lights(game.board)
             game.refresh()
 
     log.close()
@@ -46,7 +51,6 @@ def prepare_log(log, file_input):
     log.write('Datafile: ' + file_input.filename + '\n')
     log.write('Seed: ' + str(file_input.seed) + '\n')
     log.write('Black box enforcement: ' + 'True\n' if file_input.black_box == 1 else 'False\n')
-    log.write('Logfile: ' + file_input.logfile + '\n')
 
 
 if __name__ == '__main__':
