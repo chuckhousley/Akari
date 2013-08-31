@@ -14,7 +14,6 @@ class Game:
         for i in range(self.max_x):
             for j in range(self.max_y):
                 self.board[(i+1, j+1)] = 6
-
         for i in file_input.block_list:
             self.board[(i[0], i[1])] = i[2]
 

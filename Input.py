@@ -52,7 +52,10 @@ class Input:
                 except ValueError:
                     self.seed = 0
             elif line[0:9] == 'black_box':
-                self.black_box = line[10:-1]  #this does something later?
+                try:
+                    self.black_box = int(line[10])
+                except ValueError:
+                    self.you_messed_up()
             elif line[0:4] == 'runs':
                 try:
                     self.runs = int(line[5:])
