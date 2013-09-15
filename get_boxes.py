@@ -23,7 +23,7 @@ def get_all_mutually_lit(board):
 
 
 def get_all_lights(board):
-    return get_all(board, [8])
+    return get_all(board, [8, 9])
 
 def get_neighbors(game, x, y):
     neighbors = []
@@ -49,7 +49,7 @@ def rec_lightable_tile_finder(game, x, y):
         return False
     if game.board[(x, y)] in [0, 1, 2, 3, 4, 5, 9]:
         return False
-    if game.board[(x, y)] in [6, 7, 8]:
+    if game.board[(x, y)] in [-1, 6, 7, 8]:
         return True
 
 

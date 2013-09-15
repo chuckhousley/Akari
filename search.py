@@ -13,7 +13,7 @@ def random_search(game, enforce):
             except IndexError:
                 break
             if game.rand.random() > chance:
-                place_light(game, t[0], t[1])
+                #place_light(game, t[0], t[1])
                 count += 1
                 break
         if len(get_all_mutually_lit(game.board)) > 0 or (enforce and black_box_check(game)):

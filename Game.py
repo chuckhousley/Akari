@@ -24,13 +24,29 @@ class Game:
                 self.board[tile] = 6
     
     def _validity_enforced(self, pg):
+        zeroes = get_all(self.board, [0])
+        lights = []
+        for z in zeroes:
+            neighbors = get_neighbors(self, z[0], z[1])
+            for n in neighbors:
+                if self.board[n] == 6:
+                    self.board[n] = -1
+            
         num_boxes = get_all(self.board, [1, 2, 3, 4])
         for box in num_boxes:
             if get_neighbor_values(self, box[0], box[1]).count(6) == self.board[box]: #if there are exactly n blank spaces next to the n-numbered box, place light bulbs there
                 neighbors = get_neighbors(self, box[0], box[1])
                 for n in neighbors:
-                    place_light(self, n[0], n[1])
-
+                    if self.board[n] == 6:
+                        lights = lights + [n]
+                        
+        for n in self.board.keys():
+            if self.board[n] == -1:
+                self.board[n] = 6
+                
+        for l in lights:
+            place_light(self, l[0], l[1])
+                    
     def _random_board_create(self, pg):
         first = self.rand.choice(get_all_unlit(self.board)) #get one random unlit tile from board
         place_light(self, first[0], first[1]) #this ensures the all boards generated have at least 1 bulb to be placed

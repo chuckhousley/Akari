@@ -4,14 +4,14 @@ from get_boxes import *
 def place_light(game, x, y):
     board = game.board
     n = board[(x, y)]
-    if n in [0, 1, 2, 3, 4, 5, 8, 9]: #there is a block or a light already occupying this spot
+    if n in [0, 1, 2, 3, 4, 5, 8, 9]: #there is a block or a light already occupying this spot, or cannot be placed
         return
     else:
         update_tile(board, x, y, n+2) #n=6 -> tile is now 8 (lit): n=7 -> tile is now 9 (mutually lit)
          
     tiles = get_reachable(game, x, y)
     for t in tiles: #lights all reachable tiles 
-        if board[t] == 6: #empty tiles
+        if board[t] in [6, -1]: #empty tiles
             board[t] = 7 #are now lit
             continue
         elif board[t] == 8: #light bulb tiles
@@ -34,4 +34,10 @@ def update_tile(board, x, y, n):
     if type(n) == int:
         board[(x, y)] = n
     else:
-        print 'you tried to update a tile with not an int, idiot.'
+        print 'you tried to update a tile with something that\'s not an int, idiot.'
+        
+def new_child(game, parents):
+    bulbs = []
+    bulbs.append(get_all_lights(game, parents[0]))
+        
+        
