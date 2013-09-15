@@ -1,39 +1,36 @@
 __author__ = 'Chuck'
 
-from Game import *
-from Input import *
-from functions import get_all_lights, random_board_create
+from Game import Game
+from Input import Input #for project globals
+from functions import get_all_lights
 from search import random_search
 import sys
-
 
 def main():
     #theres a better way to do this, but this is faster
     if len(sys.argv) == 3 and sys.argv[1] == '-c':
-        filename = sys.argv[2]
+        fn = sys.argv[2]
     else:
-        filename = 'default.cfg'
-
-    file_input = Input(filename)
-    game = Game(file_input)
-
-    if not file_input.datafile:
-        random_board_create(game, file_input)
+        fn = 'default.cfg'
+        
+    pg = Input(fn) #read in the input file to the project's globals class
+    game = Game(pg) #create the initial game board
 
     best_result = -1
     best_soln = None
 
-    log = open(file_input.logfile, 'w')
-    prepare_log(log, file_input)
+    log = open(pg.logfile, 'w')
+    prepare_log(log, pg)
 
-    soln = open(file_input.solnfile, 'w')
+    soln = open(pg.solnfile, 'w')
 
-    for m in range(file_input.runs):
+    for m in range(pg.runs):
         log.write('\nRun ' + str(m+1) + '\n')
-        for n in xrange(10000):
-            result = random_search(game, file_input.black_box)
-            log.write(str(n+1) + '\t' + str(result) + '\n')
+        print 'Running Run #' + str(m+1) + '\n'
+        for n in xrange(pg.evaluations):
+            result = random_search(game, pg.black_box)
             if result > best_result:
+                log.write(str(n+1) + '\t' + str(result) + '\n')
                 best_result = result
                 best_soln = get_all_lights(game.board)
             game.refresh()
