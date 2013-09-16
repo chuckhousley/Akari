@@ -4,10 +4,12 @@ from Game import Game
 from Input import Input #for project globals
 from functions import get_all_lights, new_child
 from tourney import *
-from search import random_search
+from search import evolution
+from random import Random, randint
 import sys
 
 def main():
+    print 'start'
     #theres a better way to do this, but this is faster
     if len(sys.argv) == 3 and sys.argv[1] == '-c':
         fn = sys.argv[2]
@@ -16,28 +18,33 @@ def main():
         
     pg = Input(fn) #read in the input file to the project's globals class
     game = Game(pg) #create the initial game board
-    survivors = []
-    children = []
     
-    '''for m in range(pg.mu):
-        new_parent = random_search(game, pg.black_box)
-        survivors.append((game.board, new_parent))
-        game.refresh()
-    while len(children) < pg.lam:
-        if pg.parent_select == 'fps':
-            parents = fitness_prop_select(game, survivors)
-        elif pg.parent_select == 'k':
-            parents = parent_ktournament(game, survivors)
-            
-        children.append(new_child(game, parents))'''
-            
-        
-    best_result = -1
-    best_soln = None
-
     log = open(pg.logfile, 'w')
     prepare_log(log, pg)
-    for m in range(pg.runs):
+    
+    best_fitness = -1
+    best_soln = None
+    
+    for n in range(pg.runs):
+        print 'Starting run #' + str(n+1) + '\n'
+        log.write('\nRun ' + str(n+1) + '\n')
+        result = evolution(game, pg, log)
+        
+        if result[1] >= best_fitness:
+            best_soln = get_all_lights(result[0])
+            best_fitness = result[1]
+        if not pg.datafile:
+            pg.seed = randint(0, maxint)
+            game.rand = Random(pg.seed)
+            game.new_random_board(pg)    
+        
+    
+    #################################
+    log.close()
+
+    
+    
+    '''for m in range(pg.runs):
         log.write('\nRun ' + str(m+1) + '\n')
         print 'Running Run #' + str(m+1) + '\n'
         for n in xrange(pg.evaluations):
@@ -46,11 +53,9 @@ def main():
                 log.write(str(n+1) + '\t' + str(result) + '\n')
                 best_result = result
                 best_soln = get_all_lights(game.board)
-            game.refresh()
-    log.close()
-    
+            game.refresh()'''
     soln = open(pg.solnfile, 'w')
-    soln.write(str(best_result) + '\n')
+    soln.write(str(best_fitness) + '\n')
     for coordinates in best_soln:
         soln.write(str(coordinates[0]) + ' ' + str(coordinates[1]) + '\n')
     soln.close()
@@ -60,7 +65,7 @@ def prepare_log(log, file_input):
     log.write('Result Log\n')
     log.write('Datafile: ' + file_input.filename + '\n')
     log.write('Seed: ' + str(file_input.seed) + '\n')
-    log.write('Black box enforcement: ' + 'True\n' if file_input.black_box == 1 else 'False\n')
+    log.write('Black box enforcement: ' + ('True\n' if file_input.black_box == 1 else 'False\n'))
 
 
 if __name__ == '__main__':

@@ -88,9 +88,9 @@ class Input:
                     self.parent_select = line[7:-1]
                 except ValueError:
                     self.you_messed_up()
-            elif line[:7] == 'survivor':
+            elif line[:8] == 'survivor':
                 try:
-                    self.survivor_select = line[8:]
+                    self.survivor_select = line[9:-1]
                 except ValueError:
                     self.you_messed_up()
             elif line[:2] == 'mu':

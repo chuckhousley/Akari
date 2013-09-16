@@ -96,28 +96,7 @@ class Game:
         f.close()
         pg.filename = lup
 
-
-    def __init__(self, pg):
-        self.max_x = pg.x
-        self.max_y = pg.y
         
-        if not pg.datafile:
-            self._random_board_create(pg)
-        else:
-            for i in range(1, self.max_x+1):
-                for j in range(1, self.max_y+1):
-                    self.board[(i, j)] = 6 #sets all tiles to unlit
-            for i in pg.block_list:
-                self.board[(i[0], i[1])] = i[2]
-            
-        if pg.init == 'vf':               #if validity is forced, the original game board will have the light bulbs that surround 
-            self._validity_enforced(pg)   #the numbered boxes in only one way already there
-
-        for tile in self.board.keys():
-            self.original_state[tile] = self.board[tile]
-
-        self.rand = Random(pg.seed)
-
     def refresh(self):
         for tile in self.board.keys():
             self.board[tile] = self.original_state[tile]
@@ -126,4 +105,25 @@ class Game:
         for tile in self.board.keys():
             self.board[tile] = 6
         self._random_board_create(pg)
+    
+    def __init__(self, pg):
+        self.max_x = pg.x
+        self.max_y = pg.y
+        self.rand = Random(pg.seed)
+        
+        for i in range(1, self.max_x+1):
+                for j in range(1, self.max_y+1):
+                    self.board[(i, j)] = 6 #sets all tiles to unlit
+        
+        if not pg.datafile:
+            self._random_board_create(pg)
+        else:
+            for i in pg.block_list:
+                self.board[(i[0], i[1])] = i[2]
+            
+        if pg.init == 'vf':               #if validity is forced, the original game board will have the light bulbs that surround 
+            self._validity_enforced(pg)   #the numbered boxes in only one way already there
+
+        for tile in self.board.keys():
+            self.original_state[tile] = self.board[tile]
             
