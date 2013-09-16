@@ -17,7 +17,6 @@ def place_light(game, x, y):
     for t in tiles: #lights all reachable tiles 
         if board[t] in [6, -1]: #empty tiles
             board[t] = 7 #are now lit
-            continue
         elif board[t] == 8: #light bulb tiles
             board[t] = 9 #are now lit by another light bulb
 
@@ -45,7 +44,7 @@ def new_child(game, parents, enforce):
     bulbs = get_all_lights(parents[0][0]) + get_all_lights(parents[1][0])
     
     for b in bulbs:
-        if game.board[b] == 8:
+        if game.original_state[b] == 8:
             bulbs.remove(b)
             
     while True:
@@ -71,10 +70,13 @@ def new_child(game, parents, enforce):
             place_light(game, mut_x, mut_y)
             
         
-    fitness = len(get_all_lit(game.board)) if not len(get_all_mutually_lit(game.board)) else 0
-    if enforce and black_box_check(game):
-        fitness = 0 
-    return [(game.board, fitness)]
+    if len(get_all_mutually_lit(game.board)) > 0:
+        return (game.board, 0)
+    elif enforce and black_box_check(game):
+        return (game.board, 0)
+    else:
+        fitness = len(get_all_lit(game.board))
+        return (game.board, fitness)
 
 def find_average(survivors):
     total_fitness = 0

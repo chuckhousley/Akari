@@ -31,6 +31,7 @@ def main():
         result = evolution(game, pg, log)
         
         if result[1] >= best_fitness:
+            best_board = result[0]
             best_soln = get_all_lights(result[0])
             best_fitness = result[1]
         if not pg.datafile:
@@ -42,18 +43,6 @@ def main():
     #################################
     log.close()
 
-    
-    
-    '''for m in range(pg.runs):
-        log.write('\nRun ' + str(m+1) + '\n')
-        print 'Running Run #' + str(m+1) + '\n'
-        for n in xrange(pg.evaluations):
-            result = random_search(game, pg.black_box)
-            if result > best_result:
-                log.write(str(n+1) + '\t' + str(result) + '\n')
-                best_result = result
-                best_soln = get_all_lights(game.board)
-            game.refresh()'''
     soln = open(pg.solnfile, 'w')
     soln.write(str(best_fitness) + '\n')
     for coordinates in best_soln:

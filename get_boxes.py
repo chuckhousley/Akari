@@ -7,7 +7,7 @@ def get_all(board, n):
 
 
 def get_all_num_boxes(board):
-    return get_all(board, range(5))
+    return get_all(board, [0, 1, 2, 3])
 
 
 def get_all_unlit(board):

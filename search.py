@@ -5,23 +5,28 @@ from tourney import *
 
 
 def random_search(game, enforce):
+    game.refresh()
     while True:
         chance = game.rand.random()
         count = 0
         while True:
             try:
-                t = game.rand.choice(get_all_unlit(game.board))
+                t = game.rand.choice(get_all(game.board, [6, 7]))
             except IndexError:
                 break
-            if game.rand.random() > chance:
+            if game.rand.random() < chance:
                 place_light(game, t[0], t[1])
                 count += 1
                 break
-        if len(get_all_mutually_lit(game.board)) > 0 or (enforce and black_box_check(game)):
-            return 0
-        if game.rand.randint(0,1):
-            break
-    return len(get_all_lit(game.board))
+        if len(get_all_mutually_lit(game.board)) > 0:
+            return (game.board, 0)
+        elif enforce and black_box_check(game):
+            return (game.board, 0)
+        elif not game.rand.randint(0,10):
+            return_board = {}
+            for n in game.board.keys():
+                return_board[n] = game.board[n]
+            return (return_board, len(get_all_lit(game.board)))
 
 
 def evolution(game, pg, log):
@@ -33,7 +38,8 @@ def evolution(game, pg, log):
     for m in range(pg.mu):
         game.refresh()
         new_parent = random_search(game, pg.black_box)
-        survivors.append((game.board, new_parent))
+        survivors.append(new_parent)
+    
         
     while total_evals < pg.evaluations:
         update_log(log, total_evals, survivors)
@@ -42,12 +48,16 @@ def evolution(game, pg, log):
                 parents = fitness_prop_select(game, survivors)
             elif pg.parent_select == 'k':
                 parents = parent_ktournament(game, survivors)
-                
-            children.extend(new_child(game, parents, pg.black_box))
+            child = new_child(game, parents, pg.black_box)
+            for n in child[0].keys():
+                if child[0][n] == 9 and child[1] > 0:
+                    print 'what'  
+            children.append(child)
             total_evals += 1
             
         survivors.extend(children)
         children = []
+        
         if pg.survivor_select == 't':
             survivors = survivor_truncation(game, survivors, pg.mu)
         elif pg.survivor_select == 'k':
