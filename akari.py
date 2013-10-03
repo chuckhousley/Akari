@@ -1,7 +1,7 @@
 __author__ = 'Chuck'
 
 from Game import Game
-from Input import Input #for project globals
+import globals
 from functions import get_all_lights, new_child
 from tourney import *
 from search import evolution
@@ -16,16 +16,18 @@ def main():
     else:
         fn = 'default.cfg'
         
-    pg = Input(fn) #read in the input file to the project's globals class
-    game = Game(pg) #create the initial game board
+    globals.init(fn)    # read in the input file to the project's globals
+    game = Game()       # create the initial game board
     
-    log = open(pg.logfile, 'w')
-    prepare_log(log, pg)
+    log = open(globals.logfile, 'w')
+    prepare_log(log)
     
     best_fitness = -1
     best_soln = None
-    
-    for n in range(pg.runs):
+
+    sys.exit()
+
+    for n in range(globals.runs):
         print 'Starting run #' + str(n+1) + '\n'
         log.write('\nRun ' + str(n+1) + '\n')
         result = evolution(game, pg, log)
@@ -34,27 +36,25 @@ def main():
             best_board = result[0]
             best_soln = get_all_lights(result[0])
             best_fitness = result[1]
-        if not pg.datafile:
-            pg.seed = randint(0, maxint)
-            game.rand = Random(pg.seed)
-            game.new_random_board(pg)    
-        
-    
+        if not globals.datafile:
+            globals.seed = randint(0, maxint)
+            game.rand = Random(globals.seed)
+            game.new_random_board(pg)
     #################################
     log.close()
 
-    soln = open(pg.solnfile, 'w')
+    soln = open(globals.solnfile, 'w')
     soln.write(str(best_fitness) + '\n')
     for coordinates in best_soln:
         soln.write(str(coordinates[0]) + ' ' + str(coordinates[1]) + '\n')
     soln.close()
 
 
-def prepare_log(log, file_input):
+def prepare_log(log):
     log.write('Result Log\n')
-    log.write('Datafile: ' + file_input.filename + '\n')
-    log.write('Seed: ' + str(file_input.seed) + '\n')
-    log.write('Black box enforcement: ' + ('True\n' if file_input.black_box == 1 else 'False\n'))
+    log.write('Datafile: ' + globals.filename + '\n')
+    log.write('Seed: ' + str(globals.seed) + '\n')
+    log.write('Black box enforcement: ' + ('True\n' if globals.black_box == 1 else 'False\n'))
 
 
 if __name__ == '__main__':
