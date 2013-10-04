@@ -4,9 +4,10 @@ from log_fn import *
 from functions import *
 from get_boxes import *
 from tourney import *
+from search_fn import *
 
 
-def random_search(game, enforce):
+def random_search(game):
     game.refresh()
     while True:
         chance = game.rand.random()
@@ -20,7 +21,7 @@ def random_search(game, enforce):
                 break
         if len(get_all_mutually_lit(game.board)) > 0:
             return game.board, 0
-        elif enforce and black_box_check(game):
+        elif g.black_box and black_box_check(game):
             return game.board, 0
         elif not game.rand.randint(0, 10):
             return_board = {}
@@ -35,36 +36,19 @@ def evolution(game, log):
     best = (None, 0)
     total_evals = g.mu
     
-    for m in range(g.mu):
+    for m in range(g.mu):  # creates initial list of mu parents
         game.refresh()
-        new_parent = random_search(game, g.black_box)
-        survivors.append(new_parent)
+        survivors.append(random_search(game))
 
     while total_evals < g.evaluations:
         update_log(log, total_evals, survivors)
+        del children[:]
         while len(children) < g.lam and total_evals < g.evaluations:
-            if g.parent_select == 'fps':
-                parents = fitness_prop_select(game, survivors)
-            elif g.parent_select == 'k':
-                parents = parent_ktournament(game, survivors)
-            else:
-                print('Parent selection not valid, please update the cfg file')
-                return Null
-
-            child = new_child(game, parents, g.black_box)
-            for n in child[0].keys():
-                if child[0][n] == 9 and child[1] > 0:
-                    print 'what'  
-            children.append(child)
+            parents = parent_selection(game, survivors)
+            children.append(new_child(game, parents, g.black_box))
             total_evals += 1
             
-        survivors.extend(children)
-        children = []
-        
-        if g.survivor_select == 't':
-            survivors = survivor_truncation(survivors, g.mu)
-        elif g.survivor_select == 'k':
-            survivors = survivor_ktournament(game, survivors, g.mu)
+        survivors = survivor_selection(game, survivors, children)
 
         new_best = find_best(survivors)
         if new_best[1] >= best[1]:

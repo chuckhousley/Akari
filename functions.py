@@ -22,7 +22,7 @@ def place_light(game, x, y):
             board[t] = 9         # are now lit by another light bulb
 
 
-#checks to see if there are more lights surrounding a numbered black box than the number on the box
+# checks to see if there are more lights surrounding a numbered black box than the number on the box
 def black_box_check(game):
     boxes = get_all_num_boxes(game.board)
     for m in boxes:
@@ -35,7 +35,8 @@ def black_box_check(game):
             return True
     return False
 
-
+# updates a tile during board creation. used for black boxes
+# dangerous if light is placed this way (use place_light)
 def update_tile(board, x, y, n):
     if type(n) == int:
         board[(x, y)] = n

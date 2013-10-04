@@ -27,6 +27,8 @@ def main():
         print 'Starting run #' + str(n+1) + '\n'
         log.write('Run ' + str(n+1) + '\n')
         result = evolution(game, log)
+        if not result:
+            exit()
         
         if result[1] >= best_fitness:
             best_soln = get_all_lights(result[0])

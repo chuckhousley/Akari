@@ -1,4 +1,5 @@
 from sys import maxint
+import g
 
 
 def fitness_prop_select(game, survivors):
@@ -14,7 +15,7 @@ def fitness_prop_select(game, survivors):
 
 
 def parent_ktournament(game, survivors):
-    return [game.rand.choice(survivors), game.rand.choice(survivors)]
+    return [] + [game.rand.choice(survivors)]*g.k_parent
 
 
 def survivor_ktournament(game, survivors, mu):
@@ -31,3 +32,7 @@ def survivor_truncation(survivors, mu):
                 worst_survivor = n
         del survivors[worst_survivor]
     return survivors
+
+
+def uniform_random_selection(game, selection):
+    pass
