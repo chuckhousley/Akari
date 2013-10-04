@@ -23,6 +23,9 @@ def init(fn):
     global k_parent
     global k_survive
     global strategy
+    global penalty
+    global light_penalty
+    global box_penalty
     global terminate
     global x
     global y
@@ -44,6 +47,9 @@ def init(fn):
     k_parent = None
     k_survive = None
     strategy = None
+    penalty = None
+    light_penalty = None
+    box_penalty = None
     terminate = None
     x = None
     y = None
@@ -55,6 +61,7 @@ def init(fn):
     try:
         f = open(filename, 'r')
     except IOError:
+        print 'failed to open', filename
         you_messed_up()
     
     for line in f:
@@ -62,6 +69,7 @@ def init(fn):
             try:
                 datafile = int(line[9])
             except ValueError:
+                print 'datafile\n'
                 you_messed_up()
         elif line[:8] == 'filename':
             try:
@@ -87,57 +95,87 @@ def init(fn):
             try:
                 black_box = int(line[10])
             except ValueError:
+                print 'black box\n'
                 you_messed_up()
         elif line[:4] == 'runs':
             try:
                 runs = int(line[5:])
             except ValueError:
+                print 'runs\n'
                 you_messed_up()
         elif line[:4] == 'eval':
             try:
                 evaluations = int(line[5:])
             except ValueError:
+                print 'eval\n'
                 you_messed_up()
         elif line[:4] == 'init':
             try:
                 init_type = line[5:-1]
             except ValueError:
+                print 'init\n'
                 you_messed_up()
         elif line[:6] == 'parent':
             try:
                 parent_select = line[7:-1]
             except ValueError:
+                print 'parent\n'
                 you_messed_up()
         elif line[:8] == 'survivor':
             try:
                 survivor_select = line[9:-1]
             except ValueError:
+                print 'survivor\n'
                 you_messed_up()
         elif line[:2] == 'mu':
             try:
                 mu = int(line[3:])
             except ValueError:
+                print 'mu\n'
                 you_messed_up()
         elif line[:6] == 'lambda':
             try:
                 lam = int(line[7:])
             except ValueError:
+                print 'lambda\n'
                 you_messed_up()
         elif line[:7] == 'kparent':
             try:
                 k_parent = int(line[8:])
             except ValueError:
+                print 'kparent\n'
                 you_messed_up()
         elif line[:9] == 'ksurvival':
             try:
                 k_survive = int(line[10:])
             except ValueError:
+                print 'ksurvival\n'
                 you_messed_up()
         elif line[:8] == 'strategy':
             try:
                 strategy = line[9:-1]
             except ValueError:
+                print 'strategy\n'
                 you_messed_up()
+        elif line[:7] == 'penalty':
+            try:
+                if line[8:-1] == 'yes':
+                    penalty = True
+                elif line[8:-1] == 'no':
+                    penalty = False
+            except ValueError:
+                print 'penalty\n'
+                you_messed_up()
+        elif line[:13] == 'light_penalty':
+            try:
+                light_penalty = int(line[14:])
+            except ValueError:
+                light_penalty = 1
+        elif line[:11] == 'box_penalty':
+            try:
+                box_penalty = int(line[12:])
+            except ValueError:
+                box_penalty = 1
         elif line[:9] == 'terminate':
             try:
                 terminate = int(line[10:])

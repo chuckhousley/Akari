@@ -75,7 +75,7 @@ class Game:
             choice = self.rand.random()
             if choice < 0.01:  # small chance to place a bulb on board
                 place_light(self, tile[0], tile[1])
-            elif choice > 0.95:  # small chance to place a blank black box
+            elif choice > 0.98:  # smaller chance to place a blank black box
                 update_tile(self.board, tile[0], tile[1], 5)
 
         for box in get_all(self.board, [5]):
@@ -90,14 +90,16 @@ class Game:
             self._clean_board()
             self.original_state[tile] = self.board[tile]
     
-        lup = 'puzzle-' + str(pg.seed) + '.lup'
+        lup = str(g.seed) + '.lup'
+        g.logfile = str(g.seed) + '.log'
+        g.soln_file = str(g.seed) + '.soln'
         f = open(lup, 'w')
-        f.write(str(pg.x) + '\n')
-        f.write(str(pg.y) + '\n')
+        f.write(str(g.x) + '\n')
+        f.write(str(g.y) + '\n')
         for box in get_all(self.board, range(6)):
             f.write(str(box[0]) + ' ' + str(box[1]) + ' ' + str(self.board[box]) + '\n')
         f.close()
-        pg.filename = lup
+        g.filename = lup
 
     def refresh(self):
         for tile in self.board.keys():
@@ -123,7 +125,7 @@ class Game:
             for i in g.block_list:
                 self.board[(i[0], i[1])] = i[2]
             
-        if g.init == 'vf':       # if validity is forced, the original game board will have the
+        if g.init_type == 'vf':             # if validity is forced, the original game board will have the
             self._validity_enforced()  # light bulbs that surround the numbered boxes in only one way already there
 
         for tile in self.board.keys():

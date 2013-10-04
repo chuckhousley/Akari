@@ -1,5 +1,7 @@
 __author__ = 'Chuck'
 from get_boxes import *
+import g
+from sys import maxint
 
 
 def place_light(game, x, y):
@@ -25,15 +27,17 @@ def place_light(game, x, y):
 # checks to see if there are more lights surrounding a numbered black box than the number on the box
 def black_box_check(game):
     boxes = get_all_num_boxes(game.board)
+
+    return_value = 0
     for m in boxes:
         neighbors = get_neighbor_values(game, m[0], m[1])
         count = 0
         for n in neighbors:
             if n in [8, 9]:
                 count += 1
-        if game.board[m] < count:
-            return True
-    return False
+        return_value += count - game.board[(m[0], m[1])] if count > game.board[(m[0], m[1])] else 0
+
+    return return_value
 
 
 # updates a tile during board creation. used for black boxes
@@ -45,7 +49,31 @@ def update_tile(board, x, y, n):
         print 'you tried to update a tile with something that\'s not an int, idiot.'
 
 
-def new_child(game, parents, enforce):
+def calculate_penalty_fitness(game):
+    fitness = len(get_all_lit(game.board))
+    light_penalty = g.light_penalty * len(get_all_mutually_lit(game.board))
+    box_penalty = g.box_penalty * black_box_check(game) if g.black_box else 0
+    answer = fitness - light_penalty - box_penalty
+    return answer
+
+
+def calculate_normal_fitness(game):
+    if len(get_all_mutually_lit(game.board)) > 0:
+        return 0
+    elif g.black_box and not black_box_check(game):
+        return 0
+    else:
+        return len(get_all_lit(game.board))
+
+
+def remove_bulb_from_list(bulbs, current):
+    try:
+        bulbs.remove(current)
+    except ValueError:  # if bulb-to-be-removed is a random tile and not actually a bulb:
+        pass            # nothing happens
+
+
+def new_child(game, parents):
     game.refresh()
     bulbs = get_all_lights(parents[0][0]) + get_all_lights(parents[1][0])  # makes a list of all bulbs
                                                                            # from both parents
@@ -61,10 +89,7 @@ def new_child(game, parents, enforce):
 
         c = game.rand.randint(1, 20)  # arbitrary, can be adjusted to change mutation rates
         if c == 1:  # chance to remove selected bulb
-            try:
-                bulbs.remove(b)
-            except ValueError:  # if bulb-to-be-removed is a random tile and not actually a bulb:
-                pass            # nothing happens
+            remove_bulb_from_list(bulbs, b)
         elif c == 2:  # place light on random tile
             rand_x = game.rand.randint(1, game.max_x)
             rand_y = game.rand.randint(1, game.max_y)
@@ -75,14 +100,10 @@ def new_child(game, parents, enforce):
             mut_x = b[0] + game.rand.choice([-1, 0, 0, 0, 0, 0, 1])  # chance to skew x or y
             mut_y = b[1] + game.rand.choice([-1, 0, 0, 0, 0, 0, 1])  # by one in either direction
             place_light(game, mut_x, mut_y)                          # if bulb is placed out of bounds, nothing happens
+            remove_bulb_from_list(bulbs, b)
 
-    if len(get_all_mutually_lit(game.board)) > 0:
-        return game.board, 0
-    elif enforce and black_box_check(game):
-        return game.board, 0
-    else:
-        fitness = len(get_all_lit(game.board))
-        return game.board, fitness
+    fitness = calculate_penalty_fitness(game) if g.penalty else calculate_normal_fitness(game)
+    return dict(game.board), fitness
 
 
 def find_average(survivors):
@@ -93,8 +114,8 @@ def find_average(survivors):
 
 
 def find_best(survivors):
-    best_fitness = (None, 0)
+    best_fitness = (None, -maxint)
     for s in survivors:
         if s[1] > best_fitness[1]:
-            best_fitness = s
+            best_fitness = tuple(s)
     return best_fitness

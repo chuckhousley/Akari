@@ -19,10 +19,11 @@ def prepare_log(log):
     log.write('Datafile: ' + str(g.filename) + '\n')
     log.write('Seed: ' + str(g.seed) + '\n')
     log.write('Black box enforcement: ' + ('True\n' if g.black_box == 1 else 'False\n'))
+    log.write('\n==================================================\n')
 
 
 def update_log(log, total_evals, survivors):
-    log.write(str(total_evals) + '\t' + str(find_average(survivors)) + '\t' + str(find_best(survivors)[1]) + '\n')
+    log.write(str(total_evals) + '\t' + str('%.2f' % find_average(survivors)) + '\t' + str(find_best(survivors)[1]) + '\n')
 
 
 def create_soln_file(best_fitness, best_soln):
@@ -31,3 +32,4 @@ def create_soln_file(best_fitness, best_soln):
     for coordinates in best_soln:
         soln.write(str(coordinates[0]) + ' ' + str(coordinates[1]) + '\n')
     soln.close()
+    print 'solution written'

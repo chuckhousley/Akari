@@ -17,9 +17,9 @@ def parent_selection(game, survivors):
 
 def _s_select(game, survivors):
     if g.survivor_select == 't':
-        return survivor_truncation(survivors, g.mu)
+        return survivor_truncation(survivors)
     elif g.survivor_select == 'k':
-        return survivor_ktournament(game, survivors, g.mu)
+        return survivor_ktournament(game, survivors)
     elif g.survivor_select == 'ur':
         return uniform_random_selection(game, survivors)
     else:
@@ -29,9 +29,9 @@ def _s_select(game, survivors):
 
 def survivor_selection(game, survivors, children):
     if g.strategy == 'plus':
-        return _s_select(game, survivors + children)
+        return list(_s_select(game, list(survivors + children)))
     elif g.strategy == 'comma':
-        return _s_select(game, children)
+        return list(_s_select(game, list(children)))
     else:
         print 'Invalid selection strategy, please update the cfg file'
         exit(1)

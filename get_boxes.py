@@ -15,7 +15,7 @@ def get_all_unlit(board):
 
 
 def get_all_lit(board):
-    return get_all(board, [7, 8])
+    return get_all(board, [7, 8, 9])
 
 
 def get_all_mutually_lit(board):
