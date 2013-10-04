@@ -37,7 +37,7 @@ def evolution(game, log):
     total_evals = g.mu
     
     for m in range(g.mu):  # creates initial list of mu parents
-        game.refresh()
+        game.refresh()     # uses uniform random search to create list
         survivors.append(random_search(game))
 
     while total_evals < g.evaluations:

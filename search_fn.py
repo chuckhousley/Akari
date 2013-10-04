@@ -15,7 +15,7 @@ def parent_selection(game, survivors):
         exit(1)
 
 
-def _selection(game, survivors):
+def _s_select(game, survivors):
     if g.survivor_select == 't':
         return survivor_truncation(survivors, g.mu)
     elif g.survivor_select == 'k':
@@ -29,9 +29,9 @@ def _selection(game, survivors):
 
 def survivor_selection(game, survivors, children):
     if g.strategy == 'plus':
-        return _selection(game, survivors + children)
+        return _s_select(game, survivors + children)
     elif g.strategy == 'comma':
-        return _selection(game, children)
+        return _s_select(game, children)
     else:
         print 'Invalid selection strategy, please update the cfg file'
         exit(1)

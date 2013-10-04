@@ -35,8 +35,9 @@ def black_box_check(game):
             return True
     return False
 
+
 # updates a tile during board creation. used for black boxes
-# dangerous if light is placed this way (use place_light)
+# and by place_light.  use place_light to accurately update board
 def update_tile(board, x, y, n):
     if type(n) == int:
         board[(x, y)] = n
@@ -46,33 +47,34 @@ def update_tile(board, x, y, n):
 
 def new_child(game, parents, enforce):
     game.refresh()
-    bulbs = get_all_lights(parents[0][0]) + get_all_lights(parents[1][0])
-    
+    bulbs = get_all_lights(parents[0][0]) + get_all_lights(parents[1][0])  # makes a list of all bulbs
+                                                                           # from both parents
     for b in bulbs:
-        if game.original_state[b] == 8:
-            bulbs.remove(b)
+        if game.original_state[b] == 8:  # if the list contains validity enforced bulbs,
+            bulbs.remove(b)              # remove them
             
     while True:
         try:
-            b = game.rand.choice(bulbs)
-        except IndexError:
-            b = (game.rand.randint(1, game.max_x), game.rand.randint(1, game.max_y))
-        c = game.rand.randint(1, 20)
-        if c == 1:
+            b = game.rand.choice(bulbs)  # get a bulb, any bulb
+        except IndexError:  # if you don't have any bulbs:
+            b = (game.rand.randint(1, game.max_x), game.rand.randint(1, game.max_y))  # whatever, just get a tile
+
+        c = game.rand.randint(1, 20)  # arbitrary, can be adjusted to change mutation rates
+        if c == 1:  # chance to remove selected bulb
             try:
                 bulbs.remove(b)
-            except ValueError:
-                pass
-        elif c == 2:
+            except ValueError:  # if bulb-to-be-removed is a random tile and not actually a bulb:
+                pass            # nothing happens
+        elif c == 2:  # place light on random tile
             rand_x = game.rand.randint(1, game.max_x)
             rand_y = game.rand.randint(1, game.max_y)
             place_light(game, rand_x, rand_y)
-        elif c == 3:
+        elif c == 3:  # breaks out of the loop, recombination over
             break
-        else:
-            mut_x = b[0] + game.rand.choice([-1, 0, 0, 0, 1]) 
-            mut_y = b[1] + game.rand.choice([-1, 0, 0, 0, 1])
-            place_light(game, mut_x, mut_y)
+        else:  # highest probability of happening, places light on board
+            mut_x = b[0] + game.rand.choice([-1, 0, 0, 0, 0, 0, 1])  # chance to skew x or y
+            mut_y = b[1] + game.rand.choice([-1, 0, 0, 0, 0, 0, 1])  # by one in either direction
+            place_light(game, mut_x, mut_y)                          # if bulb is placed out of bounds, nothing happens
 
     if len(get_all_mutually_lit(game.board)) > 0:
         return game.board, 0
