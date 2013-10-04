@@ -1,7 +1,7 @@
 from random import Random
 from get_boxes import get_all, get_all_unlit, get_neighbors, get_neighbor_values
 from functions import place_light, update_tile
-import globals
+import g
 
 ##class notes on Game:
 #board is a dict so any tile can be accessed using board[(x, y)]
@@ -109,21 +109,21 @@ class Game:
         self._random_board_create()
     
     def __init__(self):
-        self.max_x = globals.x
-        self.max_y = globals.y
-        self.rand = Random(globals.seed)
+        self.max_x = g.x
+        self.max_y = g.y
+        self.rand = Random(g.seed)
         
         for i in range(1, self.max_x+1):
                 for j in range(1, self.max_y+1):
                     self.board[(i, j)] = 6  # sets all tiles to unlit
         
-        if not globals.datafile:
+        if not g.datafile:
             self._random_board_create()
         else:
-            for i in globals.block_list:
+            for i in g.block_list:
                 self.board[(i[0], i[1])] = i[2]
             
-        if globals.init == 'vf':       # if validity is forced, the original game board will have the
+        if g.init == 'vf':       # if validity is forced, the original game board will have the
             self._validity_enforced()  # light bulbs that surround the numbered boxes in only one way already there
 
         for tile in self.board.keys():

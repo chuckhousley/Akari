@@ -14,17 +14,14 @@ def fitness_prop_select(game, survivors):
 
 
 def parent_ktournament(game, survivors):
-    parents = []
-    parents.append(game.rand.choice(survivors))
-    parents.append(game.rand.choice(survivors))
-    return parents
+    return [game.rand.choice(survivors), game.rand.choice(survivors)]
 
 
 def survivor_ktournament(game, survivors, mu):
     return game.rand.sample(survivors, mu)
 
 
-def survivor_truncation(game, survivors, mu):
+def survivor_truncation(survivors, mu):
     while len(survivors) > mu:
         worst_fitness = maxint
         worst_survivor = None

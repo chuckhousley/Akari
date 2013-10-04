@@ -86,7 +86,7 @@ def find_average(survivors):
     total_fitness = 0
     for s in survivors:
         total_fitness += s[1]
-    return total_fitness/len(survivors)
+    return float(total_fitness)/float(len(survivors))
 
 
 def find_best(survivors):
@@ -95,9 +95,3 @@ def find_best(survivors):
         if s[1] > best_fitness[1]:
             best_fitness = s
     return best_fitness
-
-
-def update_log(log, total_evals, survivors):
-    average_fitness = find_average(survivors)
-    best_fitness = find_best(survivors)
-    log.write(str(total_evals) + '\t' + str(average_fitness) + '\t' + str(best_fitness[1]) + '\n')

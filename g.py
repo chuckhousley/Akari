@@ -22,6 +22,7 @@ def init(fn):
     global survivor_select
     global k_parent
     global k_survive
+    global strategy
     global terminate
     global x
     global y
@@ -42,6 +43,7 @@ def init(fn):
     survivor_select = None
     k_parent = None
     k_survive = None
+    strategy = None
     terminate = None
     x = None
     y = None
@@ -65,7 +67,7 @@ def init(fn):
             try:
                 filename = line[9:-1]
             except ValueError:
-                you_messed_up()
+                filename = None
         elif line[:6] == 'size_x':
             try:
                 x = int(line[7:])
@@ -131,6 +133,11 @@ def init(fn):
                 k_survive = int(line[10:])
             except ValueError:
                 you_messed_up()
+        elif line[:8] == 'strategy':
+            try:
+                strategy = line[9:-1]
+            except ValueError:
+                you_messed_up()
         elif line[:9] == 'terminate':
             try:
                 terminate = int(line[10:])
@@ -165,3 +172,6 @@ def init(fn):
     
     if not seed:
         seed = random.randint(0, maxint)
+    if mu > evaluations or lam > evaluations:
+        print 'Too few evaluations. Either increase evaluations or reduce mu and lambda'
+        exit()
