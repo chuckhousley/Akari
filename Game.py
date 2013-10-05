@@ -91,7 +91,6 @@ class Game:
             self.original_state[tile] = self.board[tile]
     
         lup = str(g.seed) + '.lup'
-        g.logfile = str(g.seed) + '.log'
         g.soln_file = str(g.seed) + '.soln'
         f = open(lup, 'w')
         f.write(str(g.x) + '\n')

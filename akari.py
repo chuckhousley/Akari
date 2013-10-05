@@ -32,13 +32,10 @@ def main():
             best_soln = list(get_all_lights(result[0]))
             best_fitness = int(result[1])
         if n < g.runs-1 and not g.datafile:
-            log.close()
             create_soln_file(best_fitness, best_soln)
             g.seed = randint(0, maxint)
             game.rand = Random(g.seed)
             game.new_random_board()
-            log = open(g.logfile, 'w')
-            prepare_log(log)
 
     log.close()
     print 'finished calculations'
