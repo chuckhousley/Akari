@@ -21,10 +21,10 @@ def random_search(game):
                 break
         if not game.rand.randint(0, 10):
             return_board = {}
-            fitness = calculate_penalty_fitness(game) if g.penalty else calculate_normal_fitness(game)
+            fitness, subfit_light, subfit_box = calculate_penalty_fitness(game)
             for n in game.board.keys():
                 return_board[n] = game.board[n]
-            return return_board, fitness
+            return return_board, fitness, subfit_light, subfit_box
 
 
 def evolution(game, log):
@@ -48,7 +48,7 @@ def evolution(game, log):
             
         survivors = survivor_selection(game, survivors, children)
 
-        new_best = find_best(survivors)
+        new_best = find_fronts(survivors)
         if new_best[1] >= best_fitness:
             best_fitness = int(new_best[1])
             best_board = dict(new_best[0])
