@@ -51,10 +51,9 @@ def update_tile(board, x, y, n):
 
 def calculate_penalty_fitness(game):
     fitness = len(get_all_lit(game.board))
-    light_penalty = g.light_penalty * len(get_all_mutually_lit(game.board))
-    box_penalty = g.box_penalty * black_box_check(game) if g.black_box else 0
-    answer = fitness - light_penalty - box_penalty
-    return answer
+    light_penalty = -1 * len(get_all_mutually_lit(game.board))
+    box_penalty = -1 * black_box_check(game)
+    return fitness, light_penalty, box_penalty
 
 
 def calculate_normal_fitness(game):
@@ -102,20 +101,75 @@ def new_child(game, parents):
             place_light(game, mut_x, mut_y)                          # if bulb is placed out of bounds, nothing happens
             remove_bulb_from_list(bulbs, b)
 
-    fitness = calculate_penalty_fitness(game) if g.penalty else calculate_normal_fitness(game)
-    return dict(game.board), fitness
+    fitness, subfit_light, subfit_box = calculate_penalty_fitness(game)
+    return dict(game.board), fitness, subfit_light, subfit_box
 
 
 def find_average(survivors):
     total_fitness = 0
+    subfit_light = 0
+    subfit_box = 0
     for s in survivors:
         total_fitness += s[1]
-    return float(total_fitness)/float(len(survivors))
+        subfit_light += s[2]
+        subfit_box += s[3]
+    fitness = float(total_fitness)/float(len(survivors))
+    light = float(subfit_light)/float(len(survivors))
+    box = float(subfit_box)/float(len(survivors))
+    return fitness, light, box
 
 
-def find_best(survivors):
-    best_fitness = (None, -maxint)
-    for s in survivors:
-        if s[1] > best_fitness[1]:
-            best_fitness = tuple(s)
-    return best_fitness
+def find_fronts(survivors):
+    fronts = [[]]  # begins by creating an empty pareto front
+    for s in survivors:  # loops through all survivors
+        if not len(fronts[0]):
+            fronts[0].append(s)  # adds first survivor to pareto front
+        else:
+            added = False
+            allowed = True
+            dominated = []
+            for a in range(len(fronts)):  # checks to see if the current survivor has
+                for b in fronts[a]:       # same fitness as member in current front
+                    cond_fit = s[1] == b[1]    # a duplicate fitness would imply that the
+                    cond_light = s[2] == b[2]  # survivor would belong on the same front
+                    cond_box = s[3] == b[3]
+                    if cond_fit and cond_light and cond_box:
+                        fronts[a].append(s)
+                        added = True
+                        break
+
+                if not added:            # if the survivor was not added that way:
+                    for b in fronts[a]:  # checks to see if the survivor is dominating
+                        cond_fit = s[1] >= b[1]    # a member of the current front
+                        cond_light = s[2] >= b[2]  # if so, then the survivor is added to
+                        cond_box = s[3] >= b[3]    # the front and the dominated members are pushed down
+                        if cond_fit and cond_light and cond_box:
+                            dominated.append(b)
+                    if len(dominated):
+                        for d in dominated:
+                            fronts[a].remove(d)        # the dominated elements are removed from their level
+                        fronts.insert(a+1, dominated)  # and are placed on a new level below the old one
+                        fronts[a].append(s)            # the survivor is inserted to level above the dominated elements
+                        added = True
+                        break
+
+                if not added:            # if the survivor still hasn't been added, checks to see if
+                    for b in fronts[a]:  # it can be placed on an existing level due to nondominance
+                        cond_fit = s[1] < b[1]    # if the survivor has fitness levels strictly less than
+                        cond_light = s[2] < b[2]  # a member of the current level, then the survivor
+                        cond_box = s[3] < b[3]    # cannot join the level
+                        if cond_fit and cond_light and cond_box:
+                            allowed = False
+                            break
+
+                if allowed and not added:  # if the survivor was not already added to the
+                    fronts[a].append(s)    # front but is allowed due to nondominance
+                    added = True           # then it is added
+                    break
+            if added:
+                continue
+
+            else:  # if all else fails, then the survivor's fitness levels were too low
+                fronts.append([s])  # and a new level is created for it.
+
+    return list(fronts)

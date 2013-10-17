@@ -5,9 +5,9 @@ import g
 def fitness_prop_select(game, survivors):
     select = []
     parents = []
-    for n in range(len(survivors)):         # for every index in the survivor list,
-        for m in range(max(1, survivors[n][1])):  # add fitness+1 (in case of fitness = 0) of that index to selection list
-            select.append(n)
+    for n in range(len(survivors)):               # for every index in the survivor list,
+        for m in range(max(1, survivors[n][1])):  # add fitness+1 (in case of fitness = 0)
+            select.append(n)                      # of that index to selection list
             
     parents.append(survivors[game.rand.choice(select)])  # only 2 parents, arbitrary choice
     parents.append(survivors[game.rand.choice(select)])

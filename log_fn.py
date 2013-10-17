@@ -1,6 +1,6 @@
 __author__ = 'Chuck'
 import g
-from functions import find_average, find_best
+from functions import find_average, find_fronts
 
 
 def prepare_log(log):
@@ -23,7 +23,16 @@ def prepare_log(log):
 
 
 def update_log(log, total_evals, survivors):
-    log.write(str(total_evals) + '\t' + str('%.2f' % find_average(survivors)) + '\t' + str(find_best(survivors)[1]) + '\n')
+    averages = find_average(survivors)
+    best_values = find_fronts(survivors)
+    ret_str = str(total_evals) + '\t'
+    ret_str += str('%.2f' % averages[0]) + '\t'
+    ret_str += str(best_values[1]) + '\t'
+    ret_str += str('%.2f' % averages[1]) + '\t'
+    ret_str += str(best_values[2]) + '\t'
+    ret_str += str('%.2f' % averages[2]) + '\t'
+    ret_str += str(best_values[3]) + '\t'
+    log.write(ret_str + '\n')
 
 
 def create_soln_file(best_fitness, best_soln):
