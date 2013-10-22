@@ -2,7 +2,7 @@ __author__ = 'Chuck'
 
 from Game import Game
 import g
-from functions import get_all_lights, new_child, calculate_penalty_fitness, place_light
+from functions import get_all_lights, new_child, calculate_penalty_fitness, place_light, determine_dominance
 from tourney import *
 from log_fn import *
 from search import evolution
@@ -19,27 +19,24 @@ def main():
     game = Game()  # create the initial game board
     log = open(g.logfile, 'w')
     prepare_log(log)
-    
-    best_fitness = -maxint
-    best_soln = None
+
+    best_soln = [(None, -maxint, -maxint, -maxint)]
 
     for n in range(g.runs):
         print 'Starting run #' + str(n+1) + '\n'
         log.write('Run ' + str(n+1) + '\n')
         result = evolution(game, log)
         
-        if result[1] > best_fitness:
-            best_soln = list(get_all_lights(result[0]))
-            best_fitness = int(result[1])
+        best_soln = determine_dominance(best_soln, result)
         if n < g.runs-1 and not g.datafile:
-            create_soln_file(best_fitness, best_soln)
+            create_soln_file(best_soln)
             g.seed = randint(0, maxint)
             game.rand = Random(g.seed)
             game.new_random_board()
 
     log.close()
     print 'finished calculations'
-    create_soln_file(best_fitness, best_soln)
+    create_soln_file(best_soln)
 
 
 if __name__ == '__main__':

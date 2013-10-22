@@ -173,3 +173,20 @@ def find_fronts(survivors):
                 fronts.append([s])  # and a new level is created for it.
 
     return list(fronts)
+
+
+def determine_dominance(old, new):
+    for a in old:
+        for b in new:
+            if a[1] < b[1] and a[2] < b[2] and a[3] < b[3]:
+                return new
+    return old
+
+
+def find_best(survivors):
+    best_fit = best_light = best_box = -maxint
+    for n in survivors:
+        best_fit = n[1] if n[1] > best_fit else best_fit
+        best_light = n[2] if n[2] > best_light else best_light
+        best_box = n[3] if n[3] > best_box else best_box
+    return best_fit, best_light, best_box

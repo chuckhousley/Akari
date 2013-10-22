@@ -30,8 +30,7 @@ def random_search(game):
 def evolution(game, log):
     survivors = []
     children = []
-    best_board = {}
-    best_fitness = 0
+    best = [(None, -maxint, -maxint, -maxint)]
     total_evals = g.mu
     
     for m in range(g.mu):  # creates initial list of mu parents
@@ -48,8 +47,6 @@ def evolution(game, log):
             
         survivors = survivor_selection(game, survivors, children)
 
-        new_best = find_fronts(survivors)
-        if new_best[1] >= best_fitness:
-            best_fitness = int(new_best[1])
-            best_board = dict(new_best[0])
-    return best_board, best_fitness
+        fronts = find_fronts(survivors)
+        best = determine_dominance(best, fronts[0])
+    return best

@@ -91,12 +91,6 @@ def init(fn):
                 seed = int(line[5:])
             except ValueError:
                 seed = 0
-        elif line[:9] == 'black_box':
-            try:
-                black_box = int(line[10])
-            except ValueError:
-                print 'black box\n'
-                you_messed_up()
         elif line[:4] == 'runs':
             try:
                 runs = int(line[5:])
@@ -157,25 +151,6 @@ def init(fn):
             except ValueError:
                 print 'strategy\n'
                 you_messed_up()
-        elif line[:7] == 'penalty':
-            try:
-                if line[8:-1] == 'yes':
-                    penalty = True
-                elif line[8:-1] == 'no':
-                    penalty = False
-            except ValueError:
-                print 'penalty\n'
-                you_messed_up()
-        elif line[:13] == 'light_penalty':
-            try:
-                light_penalty = int(line[14:])
-            except ValueError:
-                light_penalty = 1
-        elif line[:11] == 'box_penalty':
-            try:
-                box_penalty = int(line[12:])
-            except ValueError:
-                box_penalty = 1
         elif line[:9] == 'terminate':
             try:
                 terminate = int(line[10:])

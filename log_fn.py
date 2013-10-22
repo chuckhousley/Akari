@@ -1,6 +1,7 @@
 __author__ = 'Chuck'
 import g
-from functions import find_average, find_fronts
+from functions import find_average, find_fronts, find_best
+from get_boxes import get_all_lights
 
 
 def prepare_log(log):
@@ -18,27 +19,31 @@ def prepare_log(log):
     log.write('Termination limit:\t' + str(g.terminate) + '\n')
     log.write('Datafile: ' + str(g.filename) + '\n')
     log.write('Seed: ' + str(g.seed) + '\n')
-    log.write('Black box enforcement: ' + ('True\n' if g.black_box == 1 else 'False\n'))
     log.write('\n==================================================\n')
 
 
 def update_log(log, total_evals, survivors):
     averages = find_average(survivors)
-    best_values = find_fronts(survivors)
+    best_fit, best_light, best_box = find_best(survivors)
     ret_str = str(total_evals) + '\t'
     ret_str += str('%.2f' % averages[0]) + '\t'
-    ret_str += str(best_values[1]) + '\t'
+    ret_str += str(best_fit) + '\t'
     ret_str += str('%.2f' % averages[1]) + '\t'
-    ret_str += str(best_values[2]) + '\t'
+    ret_str += str(best_light) + '\t'
     ret_str += str('%.2f' % averages[2]) + '\t'
-    ret_str += str(best_values[3]) + '\t'
+    ret_str += str(best_box) + '\t'
     log.write(ret_str + '\n')
 
 
-def create_soln_file(best_fitness, best_soln):
+def create_soln_file(best_soln):
     soln = open(g.soln_file, 'w')
-    soln.write(str(best_fitness) + '\n')
-    for coordinates in best_soln:
-        soln.write(str(coordinates[0]) + ' ' + str(coordinates[1]) + '\n')
+    for m in best_soln:
+        soln.write(str(m[1]) + '\t' + str(m[2]) + '\t' + str(m[3]) + '\t' + str(len(best_soln)) + '\n')
+    soln.write('\n')
+    for m in best_soln:
+        n = get_all_lights(m[0])
+        for coordinates in n:
+            soln.write(str(coordinates[0]) + ' ' + str(coordinates[1]) + '\n')
+        soln.write('\n')
     soln.close()
     print 'solution written'

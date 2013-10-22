@@ -1,45 +1,57 @@
 from sys import maxint
 import g
+from functions import find_fronts
 
 
 def fitness_prop_select(game, survivors):
     select = []
     parents = []
-    for n in range(len(survivors)):               # for every index in the survivor list,
-        for m in range(max(1, survivors[n][1])):  # add fitness+1 (in case of fitness = 0)
-            select.append(n)                      # of that index to selection list
-            
-    parents.append(survivors[game.rand.choice(select)])  # only 2 parents, arbitrary choice
-    parents.append(survivors[game.rand.choice(select)])
+    fronts = find_fronts(survivors)
+
+    for m in range(len(fronts)):
+        for n in fronts[m]:
+            for p in range(len(fronts)-m+1):
+                select.append(n)
+
+    parents.append(game.rand.choice(select))  # only 2 parents, arbitrary choice
+    parents.append(game.rand.choice(select))
     return parents
 
 
 def parent_ktournament(game, survivors):
     return_list = []
-    for f in range(g.k_parent):
-        return_list += [game.rand.choice(survivors)]
+    tourney_list = []
+    while len(return_list) < g.mu:
+        del tourney_list[:]
+        for f in range(g.k_parent):
+            tourney_list += [game.rand.choice(survivors)]
+        fronts = find_fronts(tourney_list)
+        return_list.append(game.rand.choice(fronts[0]))
     return return_list
 
 
 def survivor_ktournament(game, survivors):
     return_list = []
-    for f in range(g.k_survive):
-        new_entry = game.rand.choice(survivors)
-        if not return_list.count(new_entry):
-            return_list += [new_entry]
+    tourney_list = []
+    while len(return_list) < g.mu:
+        del tourney_list[:]
+        for f in range(g.k_survive):
+            new_entry = game.rand.choice(survivors)
+            if not tourney_list.count(new_entry):
+                tourney_list += [new_entry]
+        fronts = find_fronts(tourney_list)
+        return_list.append(game.rand.choice(fronts[0]))
     return return_list
 
 
 def survivor_truncation(survivors):
-    while len(survivors) > g.mu:
-        worst_fitness = maxint
-        worst_survivor = None
-        for n in range(len(survivors)):
-            if survivors[n][1] <= worst_fitness:
-                worst_fitness = survivors[n][1]
-                worst_survivor = n
-        del survivors[worst_survivor]
-    return survivors
+    fronts = find_fronts(survivors)
+    survivors_sorted = []
+    for f in fronts:
+        for d in f:
+            survivors_sorted.append(d)
+    del survivors_sorted[g.mu:]
+    return survivors_sorted
 
 
 def uniform_random_selection(game, selection):
